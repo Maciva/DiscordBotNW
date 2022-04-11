@@ -293,7 +293,7 @@ function scheduleTimers(warStartMillis, msg) {
     }
     setTimeoutWrapper(() => {
         handleLeave(msg);
-    }, (30 * 60 + props.preJoinTimer + 10) * 1000, true)
+    }, (30 * 60 + parseInt(props.preJoinTimer) + 10) * 1000, true)
 }
 
 function scheduleWar(msg, args) {
