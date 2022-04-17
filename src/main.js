@@ -1,5 +1,6 @@
 const path = require('path');
 const {Client, Intents} = require("discord.js");
+const https = require('https')
 const {
     getVoiceConnection,
     joinVoiceChannel,
@@ -17,21 +18,17 @@ const respawns = require(path.join("..", 'config', 'respawns.json'));
 
 const props = config.getProperties()
 const intents = new Intents();
-intents.add(Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES)
-const client = new Client({intents: intents})
+intents.add(Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS);
+const client = new Client({
+    intents: intents,
+    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+})
 const timeouts = new Set();
 const timeWarTimeoutIdMap = new Map();
+const awaitedReplies = new Map();
 var player;
 
-client.on("ready", () => {
-    console.log(`Logged in as ${client.user.tag}!`)
-    player = createAudioPlayer({
-        behaviors: {
-            noSubscriber: NoSubscriberBehavior.Pause,
-        },
-    });
 
-})
 
 function handleHelp(msg) {
     msg.reply({
@@ -181,8 +178,79 @@ function handleList(msg) {
     msg.reply("Current scheduled Wars: " + (res.length ? res.join(", ") : "none"));
 }
 
-client.on("message", msg => {
+function handleCreateMessage(msg, args, callback) {
+    const channelId = args[0];
+    const channel = getChannelById(channelId)
+    msg.reply("Reply to this message with the message I should be posting in " + channel.name).then(res => {
+        awaitedReplies.set(res.id, (reply) => {
+            channel.send(reply.content).then(callbackRes => {
+                if(callback) {
+                    callback(callbackRes)
+                }
+            })
+        })
+    })
+}
+
+function consumeReply(msg) {
+    if(msg.type !== "REPLY") {
+        return false;
+    }
+    if(!awaitedReplies.has(msg.reference.messageId)) {
+        return false;
+    }
+    awaitedReplies.get(msg.reference.messageId)(msg);
+    awaitedReplies.delete(msg.reference.messageId);
+    return true;
+}
+
+function handleDownload(url, destination) {
+    const file = fs.createWriteStream(destination)
+    https.get(url, response => {
+        response.pipe(file);
+        file.on("finish", () => {
+            file.close()
+        })
+    })
+}
+
+client.on("ready", () => {
+    console.log(`Logged in as ${client.user.tag}!`)
+    player = createAudioPlayer({
+        behaviors: {
+            noSubscriber: NoSubscriberBehavior.Pause,
+        },
+    });
+
+})
+
+function handleFileTransfer(msg) {
+    const audioFile = msg.attachments.first();
+    if(audioFile){
+        if(audioFile.contentType === "audio/mpeg") {
+            if(msg.content === "leave") {
+                handleDownload(audioFile.url, path.join("files", "leave", audioFile.id + ".mp3"))
+            } else if (msg.content === "join") {
+                handleDownload(audioFile.url, path.join("files", "join", audioFile.id + ".mp3"))
+            } else {
+                msg.reply("my small ass brain only understands leave or join, dont type anything else besides one of these words")
+            }
+        } else {
+            msg.reply("this ain't an mp3 file")
+        }
+    } else {
+        msg.reply("You gotta attach a file m8")
+    }
+}
+
+client.on("messageCreate", msg => {
+    if(msg.author.id === client.user.id) {
+        return;
+    }
     if (msg.channel.name === props.channelName) {
+        if(consumeReply(msg)) {
+            return
+        }
         if (msg.content.startsWith(props.prefix)) {
             const args = splitArgs(msg.content)
             switch (args[0].substr(1)) {
@@ -204,8 +272,14 @@ client.on("message", msg => {
                 case "list":
                     handleList(msg);
                     break;
+                case "createMessage":
+                    handleCreateMessage(msg, args.slice(1));
+                    break;
+
             }
         }
+    } else if (msg.channel.type === "DM") {
+        handleFileTransfer(msg);
     }
 })
 
@@ -471,6 +545,10 @@ function handleLeave(msg) {
 
 function getFirstChannelFromName(name) {
     return Array.from(client.channels.cache.values()).find(channel => channel.name === name)
+}
+
+function getChannelById(id) {
+    return client.channels.cache.get(id);
 }
 
 client.login(props.token)

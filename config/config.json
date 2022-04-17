@@ -1,1 +1,1 @@
-{"token":"","preJoinTimer":"60","channelName":"general","warChannel":"war","prefix":"!","callRate":[15,10,5]}
+{"token":"","preJoinTimer":"300","channelName":"respawn-timers","warChannel":"briefing-room","prefix":"!","callRate":[15,10,5]}
