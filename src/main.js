@@ -230,8 +230,10 @@ function handleFileTransfer(msg) {
         if(audioFile.contentType === "audio/mpeg") {
             if(msg.content === "leave") {
                 handleDownload(audioFile.url, path.join("files", "leave", audioFile.id + ".mp3"))
+                msg.reply("your file has been added")
             } else if (msg.content === "join") {
                 handleDownload(audioFile.url, path.join("files", "join", audioFile.id + ".mp3"))
+                msg.reply("your file has been added")
             } else {
                 msg.reply("my small ass brain only understands leave or join, dont type anything else besides one of these words")
             }
