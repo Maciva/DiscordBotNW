@@ -22,6 +22,20 @@ function handleHelp(msg) {
                         "inline": true
                     },
                     {
+                        "name": `startWar`,
+                        "value": `Command for starting a war after a given delay.`
+                    },
+                    {
+                        "name": `Usage:`,
+                        "value": `!startWar [MM:SS]`,
+                        "inline": true
+                    },
+                    {
+                        "name": `Example:`,
+                        "value": `!startWar 05:30`,
+                        "inline": true
+                    },
+                    {
                         "name": `unscheduleWar`,
                         "value": `Command for unscheduling wars.`
                     },

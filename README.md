@@ -13,6 +13,11 @@ The bot is usable straight away with given default settings: <br/>
 - Unschedule wars by `!unscheduleWar [Timestamp]`
 - `!leaveWar` to let the bot leave the war earlier, if you managed to pull up a fast win
 ### Advanced
+To start a war in mm:ss (minutes:seconds):
+```
+!startWar mm:ss
+```
+
 To list all scheduled wars:
 ```
 !list

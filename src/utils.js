@@ -15,6 +15,19 @@ function validateTimeArgs(timeArgs) {
     }
 }
 
+function validateTimeArgsMinuteSeconds(timeArgs) {
+    if (timeArgs.length !== 2) {
+        return false;
+    }
+    try {
+        const m = parseInt(timeArgs[0])
+        const s = parseInt(timeArgs[1])
+        return m <= 60 && m >= 0 && s <= 60 && s >= 0;
+    } catch (err) {
+        return false;
+    }
+}
+
 function millisToCETString(millis) {
     const date = new Date(millis);
     return `${pad(date.getHours())}:${pad(date.getMinutes())}`
@@ -58,3 +71,4 @@ exports.validateTimeArgs = validateTimeArgs;
 exports.getRandomJoinFile = getRandomJoinFile;
 exports.getRandomLeaveFile = getRandomLeaveFile;
 exports.millisToCETString = millisToCETString;
+exports.validateTimeArgsMinuteSeconds = validateTimeArgsMinuteSeconds;
