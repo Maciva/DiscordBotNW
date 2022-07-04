@@ -56,8 +56,8 @@ Settings can be viewed by:
 - Default value: 600
 ##### callRate
 - List of times in seconds before a wave the bot should remind about the respawn wave (use qoutes)
-- Example: `!settings set callRate "[5,10,15]"`
-- Default value: "[5,10,15]"
+- Example: `!settings set callRate "5 10 15"`
+- Default value: "5 10 15"
 
 ## Setup own Server
 Install the latest node version [here](https://nodejs.org/en/download/)

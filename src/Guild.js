@@ -1,7 +1,8 @@
 const { createAudioPlayer, NoSubscriberBehavior, getVoiceConnection, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const help = require("./help");
-const { splitArgs, validateTimeArgs, getRandomLeaveFile, millisToCETString, validateTimeArgsMinuteSeconds } = require("./utils");
+const { splitArgs, validateTimeArgs, getRandomLeaveFile, millisToCETString, validateTimeArgsMinuteSeconds, isInt, extractCallRate } = require("./utils");
 const { War } = require("./War");
+const guildService = require("./guildService")
 
 class Guild {
 
@@ -192,7 +193,7 @@ class Guild {
                 msg.reply("Current call rates: " + this.callRate.join(", "));
                 break;
             case 'firstCallTimer':
-                msg.reply("Current call rates: " + this.firstCallTimer);
+                msg.reply("Current first call timer: " + this.firstCallTimer);
                 break;
             default:
                 msg.reply(args[0] + " is not a valid argument. Type !help for a list of commands");
@@ -244,7 +245,7 @@ class Guild {
             case 'callRate': {
                 const nums = extractCallRate(args[1])
                 if (!nums) {
-                    msg.reply(args[1] + " contains non numbers. Type !help for a list of commands")
+                    msg.reply(args[1] + " contains non numbers or is in the wrong format. Type !help for a list of commands")
                     return;
                 }
                 this[args[0]] = nums.sort((a, b) => a - b).reverse();

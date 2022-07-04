@@ -1,4 +1,4 @@
-const { createAudioResource, joinVoiceChannel } = require('@discordjs/voice');
+const { createAudioResource, joinVoiceChannel, AudioPlayerStatus } = require('@discordjs/voice');
 const path = require('path');
 const sounds = require('./sounds');
 const { getRandomJoinFile } = require('./utils');
@@ -45,7 +45,7 @@ class War {
             this.scheduleTimerForWave(previous, filteredRespawns[i], this.warStart, i === filteredRespawns.length - 1);
         }
         this.setTimeoutWrapper(() => {
-            this.handleLeave();
+            this.leaveWar();
         }, (30 * 60 + parseInt(this.guild.preJoinTimer) + 10) * 1000, true)
     }
 
@@ -97,7 +97,7 @@ class War {
         this.setTimeoutWrapper(() => {
             this.playFile(file);
             if (last) {
-                this.player.once(AudioPlayerStatus.Idle, () => {
+                this.guild.player.once(AudioPlayerStatus.Idle, () => {
                     this.playFile(sounds.counterSounds.noRespawn)
                 })
             }

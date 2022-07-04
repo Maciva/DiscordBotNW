@@ -98,7 +98,7 @@ function handleHelp(msg) {
                     },
                     {
                         "name": `callRate`,
-                        "value": `The bot will be sending a reminder in the voice Channel before given seconds. \n **Example:** !settings set callRate "[15,10,5]"`
+                        "value": `The bot will be sending a reminder in the voice Channel before given seconds. \n **Example:** !settings set callRate "15 10 5"`
                     },
                 ]
             }

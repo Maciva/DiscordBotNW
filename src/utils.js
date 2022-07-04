@@ -66,9 +66,33 @@ function splitArgs(string) {
     }, {a: ['']}).a
 }
 
+function isInt(arg) {
+    try {
+        parseInt(arg)
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
+function extractCallRate(arg) {
+    try {
+        let nums = arg.split(" ").map(element => parseInt(element));
+        if (nums.filter(element => element).length == 0) {
+            return undefined;
+        }
+        return nums;
+    } catch (err) {
+
+    }
+    return undefined;
+}
+
 exports.splitArgs = splitArgs;
 exports.validateTimeArgs = validateTimeArgs;
 exports.getRandomJoinFile = getRandomJoinFile;
 exports.getRandomLeaveFile = getRandomLeaveFile;
 exports.millisToCETString = millisToCETString;
 exports.validateTimeArgsMinuteSeconds = validateTimeArgsMinuteSeconds;
+exports.isInt = isInt;
+exports.extractCallRate = extractCallRate;
