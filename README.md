@@ -58,6 +58,10 @@ Settings can be viewed by:
 - List of times in seconds before a wave the bot should remind about the respawn wave (use qoutes)
 - Example: `!settings set callRate "5 10 15"`
 - Default value: "5 10 15"
+##### timeZone
+- Set the bots time calcluations to match your current time.
+- Example: `!settings set timeZone 19:30`
+- Default value: normalized for CET
 
 ## Setup own Server
 Install the latest node version [here](https://nodejs.org/en/download/)

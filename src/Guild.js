@@ -381,7 +381,7 @@ function buildSettingsDescriptorMap() {
         {
             name: "timeZone",
             value: "19:30",
-            description: "Set the bots time calcluations to match the current time."
+            description: "Set the bots time calcluations to match the current time. Either put in your local time or the time of the server you are playing on."
         },
     ].forEach(element => resultMap.set(element.name, element));
     return resultMap;
