@@ -1,4 +1,4 @@
-const {Client, Intents} = require("discord.js");
+const { Client, Intents } = require("discord.js");
 require('dotenv').config()
 const guildService = require('./guildService');
 
@@ -19,10 +19,15 @@ client.on("ready", () => {
 })
 
 client.on("messageCreate", msg => {
-    if(msg.author.id === client.user.id) {
+    if (msg.author.id === client.user.id) {
         return;
     }
     guildService.dispatch(msg.guild.id, msg);
+})
+
+client.on("interactionCreate", interaction => {
+    if (!interaction.isSelectMenu()) return;
+    guildService.interact(interaction.guild.id, interaction);
 })
 
 client.login(process.env.TOKEN)

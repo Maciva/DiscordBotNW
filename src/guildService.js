@@ -80,7 +80,27 @@ function dispatch(id, msg) {
 
 }
 
+function interact(id, interaction) {
+    if (!idToServerMap.has(id)) {
+        get(id).then(resultGuild => {
+            if (resultGuild) {
+                idToServerMap.set(id, resultGuild)
+                idToServerMap.get(id).interact(interaction);
+            } else {
+                createDefault(id).then((resultDefault) => {
+                    idToServerMap.set(id, resultDefault);
+                    idToServerMap.get(id).interact(interaction);
+                })
+            }
+        })
+    } else {
+        idToServerMap.get(id).interact(interaction);
+    }
+
+}
+
 exports.createDefault = createDefault;
 exports.get = get;
 exports.dispatch = dispatch;
+exports.interact = interact;
 exports.save = save;

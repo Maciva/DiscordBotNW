@@ -248,12 +248,12 @@ class Guild {
                 break;
             }
             case 'timeZone': {
-                if(this.startTimerWarMap.size) {
+                if (this.startTimerWarMap.size) {
                     msg.reply("Can't change time zone while scheduling wars. Use !list and !unscheduleWar all listed wars.")
                     return;
                 }
                 const millis = timeStringToMillis(args[1]);
-                if(!millis) {
+                if (!millis) {
                     msg.reply(`${args[1]} is not a valid time`)
                     return;
                 }
@@ -334,6 +334,59 @@ class Guild {
         }
     }
 
+    interact(interaction) {
+        const args = interaction.values[0].split("_");
+        switch (args[0]) {
+            case "scheduling":
+                help.helpScheduling(interaction);
+                break;
+            case "settings":
+                help.helpSettings(interaction, settingsDescriptorMap.get(args[1]));
+                break;
+            case "other":
+                help.helpOther(interaction);
+                break;
+        }
+    }
 }
+
+function buildSettingsDescriptorMap() {
+    const resultMap = new Map();
+    [
+        {
+            name: "channelName",
+            value: "\"war bot\"",
+            description: "Name of the channel the bot should listen for commands on."
+        },
+        {
+            name: "warChannel",
+            value: "\"war channel\"",
+            description: "Name of the voice channel the bot should join for war."
+        },
+        {
+            name: "preJoinTimer",
+            value: "300",
+            description: "Time in seconds before the bot should join the war channel."
+        },
+        {
+            name: "firstCallTimer",
+            value: "600",
+            description: "Time in seconds after the bot starts calling waves in war (to reduce spam for frequent early respawn waves)."
+        },
+        {
+            name: "callRate",
+            value: "5 10 15",
+            description: "List of seconds before the bot calls for respawn waves."
+        },
+        {
+            name: "timeZone",
+            value: "19:30",
+            description: "Set the bots time calcluations to match the current time."
+        },
+    ].forEach(element => resultMap.set(element.name, element));
+    return resultMap;
+}
+
+const settingsDescriptorMap = buildSettingsDescriptorMap();
 
 exports.Guild = Guild
