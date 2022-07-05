@@ -11,6 +11,11 @@ const client = new Client({
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`)
+    client.user.setPresence({
+        activities: [{
+            name: '"!help" for commands'
+        }]
+    })
 })
 
 client.on("messageCreate", msg => {
@@ -21,5 +26,7 @@ client.on("messageCreate", msg => {
 })
 
 client.login(process.env.TOKEN)
+
+
 
 global.client = client;

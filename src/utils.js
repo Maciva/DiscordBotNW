@@ -33,6 +33,15 @@ function millisToCETString(millis) {
     return `${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
+function timeStringToMillis(time) {
+    const timeArgs = time.split(":");
+    if (!validateTimeArgs(timeArgs)) {
+        return undefined;
+    }
+    const current = new Date()
+    return new Date(current.getFullYear(), current.getMonth(), current.getDate(), timeArgs[0], timeArgs[1], 0).getTime();
+}
+
 function pad(num) {
     num = num.toString();
     while (num.length < 2) num = "0" + num;
@@ -96,3 +105,4 @@ exports.millisToCETString = millisToCETString;
 exports.validateTimeArgsMinuteSeconds = validateTimeArgsMinuteSeconds;
 exports.isInt = isInt;
 exports.extractCallRate = extractCallRate;
+exports.timeStringToMillis = timeStringToMillis;

@@ -6,7 +6,9 @@ const defaultServer = {
     "channelName": "war-bot",
     "warChannel": "war-channel",
     "callRate": [15, 10, 5],
-    "firstCallTimer": "600"
+    "firstCallTimer": "600",
+    "warCount": 0,
+    "timeZone": 0
 }
 
 function createDefault(id) {
@@ -18,7 +20,7 @@ function createDefault(id) {
                 reject(err);
                 return;
             }
-            const tmp = new Guild(data.id, data.preJoinTimer, data.channelName, data.warChannel, data.callRate)
+            const tmp = new Guild(data.id, data.preJoinTimer, data.channelName, data.warChannel, data.callRate, data.warCount, data.timeZone)
             resolve(tmp);
         })
     })
@@ -31,18 +33,11 @@ function save(guild) {
         "channelName": guild.channelName,
         "warChannel": guild.warChannel,
         "callRate": guild.callRate,
-        "firstCallTimer": guild.firstCallTimer
+        "firstCallTimer": guild.firstCallTimer,
+        "warCount": guild.warCount,
+        "timeZone": guild.timeZone
     }
-    return new Promise((resolve, reject) => {
-        persistance.save(obj).then((data, err) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            const tmp = new Guild(data.id, data.preJoinTimer, data.channelName, data.warChannel, data.callRate, data.firstCallTimer)
-            resolve(tmp);
-        })
-    })
+    return persistance.save(obj);
 }
 
 const idToServerMap = new Map();
@@ -57,7 +52,7 @@ function get(id) {
                     resolve(data);
                     return;
                 }
-                const tmp = new Guild(data.id, data.preJoinTimer, data.channelName, data.warChannel, data.callRate, data.firstCallTimer)
+                const tmp = new Guild(data.id, data.preJoinTimer, data.channelName, data.warChannel, data.callRate, data.firstCallTimer, data.warCount, data.timeZone)
                 resolve(tmp);
             }
         })

@@ -59,6 +59,15 @@ function handleHelp(msg) {
                         "inline": true
                     },
                     {
+                        "name": `stats`,
+                        "value": `Command for listing stats.`
+                    },
+                    {
+                        "name": `Usage:`,
+                        "value": `!stats`,
+                        "inline": true
+                    },
+                    {
                         "name": `leaveWar`,
                         "value": `Command to make the bot leave the war channel and stop its timer`
                     },

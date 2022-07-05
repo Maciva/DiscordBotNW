@@ -1,18 +1,20 @@
 const { createAudioPlayer, NoSubscriberBehavior, getVoiceConnection, createAudioResource, AudioPlayerStatus } = require("@discordjs/voice");
 const help = require("./help");
-const { splitArgs, validateTimeArgs, getRandomLeaveFile, millisToCETString, validateTimeArgsMinuteSeconds, isInt, extractCallRate } = require("./utils");
+const { splitArgs, validateTimeArgs, getRandomLeaveFile, millisToCETString, validateTimeArgsMinuteSeconds, isInt, extractCallRate, timeStringToMillis } = require("./utils");
 const { War } = require("./War");
 const guildService = require("./guildService")
 
 class Guild {
 
-    constructor(id, preJoinTimer, channelName, warChannel, callRate, firstCallTimer) {
+    constructor(id, preJoinTimer, channelName, warChannel, callRate, firstCallTimer, warCount, timeZone) {
         this.id = id
         this.preJoinTimer = preJoinTimer;
         this.channelName = channelName;
         this.warChannel = warChannel;
         this.callRate = callRate;
         this.firstCallTimer = firstCallTimer;
+        this.warCount = warCount;
+        this.timeZone = timeZone;
         console.log(`Guild connected with id ${this.id}!`)
         this.player = createAudioPlayer({
             behaviors: {
@@ -21,6 +23,16 @@ class Guild {
         });
         this.startTimerWarMap = new Map();
         this.activeWar = null;
+    }
+
+    incrementWars() {
+        this.warCount = this.warCount + 1;
+        guildService.save(this);
+    }
+
+    decrementWars() {
+        this.warCount = this.warCount - 1;
+        guildService.save(this);
     }
 
     getFirstChannelFromName(name) {
@@ -43,12 +55,12 @@ class Guild {
                 } else {
                     msg.reply("Channel " + this.warChannel + " is not a voice channel")
                 }
-    
+
             } else {
                 msg.reply("No existing Channel " + this.warChannel)
             }
         });
-        
+
     }
 
     handleStartWar(msg, args) {
@@ -59,12 +71,12 @@ class Guild {
                 } else {
                     msg.reply("Channel " + this.warChannel + " is not a voice channel")
                 }
-    
+
             } else {
                 msg.reply("No existing Channel " + this.warChannel)
             }
         });
-        
+
     }
 
     startWar(msg, args) {
@@ -79,13 +91,14 @@ class Guild {
         }
         const current = new Date()
         const warStartMillis = new Date(current.getFullYear(), current.getMonth(), current.getDate(), current.getHours(), current.getMinutes() + parseInt(timeArgs[0]), current.getSeconds() + parseInt(timeArgs[1])).getTime();
-        const collidingTimers = [...this.startTimerWarMap.keys()].filter(time => Math.abs(time - warStartMillis) < 1000 * 60 * 30 + this.preJoinTimer * 1000 ).length != 0
-        if(collidingTimers) {
+        const collidingTimers = [...this.startTimerWarMap.keys()].filter(time => Math.abs(time - warStartMillis) < 1000 * 60 * 30 + this.preJoinTimer * 1000).length != 0
+        if (collidingTimers) {
             msg.reply(args[0] + " collides with a different war. Use !list and !unscheduleWar unwanted wars.")
             return;
         }
         const war = new War(this, msg, warStartMillis, this.startCallback, this.leaveCallback);
-        this.startTimerWarMap.set(warStartMillis, war);
+        this.startTimerWarMap.set(warStartMillis - this.timeZone, war);
+        this.incrementWars();
         msg.reply("The war starts in " + args[0] + "(mm:ss)")
     }
 
@@ -94,20 +107,18 @@ class Guild {
             msg.reply("Illegal number of arguments for war scheduling. Required: 1, Received: " + args.length + ". Type !help for a list of commands");
             return;
         }
-        const timeArgs = args[0].split(":");
-        if (!validateTimeArgs(timeArgs)) {
-            msg.reply(args[0] + " is not a valid time. Type !help for a list of commands")
-            return;
+        const warStartMillis = timeStringToMillis(args[0]) - this.timeZone;
+        if (!warStartMillis) {
+            msg.reply(`${args[0]} is not a valid time.`)
         }
-        const current = new Date()
-        const warStartMillis = new Date(current.getFullYear(), current.getMonth(), current.getDate(), timeArgs[0], timeArgs[1], 0).getTime();
-        const collidingTimers = [...this.startTimerWarMap.keys()].filter(time => Math.abs(time - warStartMillis) < 1000 * 60 * 30 + this.preJoinTimer * 1000 ).length != 0
-        if(collidingTimers) {
+        const collidingTimers = [...this.startTimerWarMap.keys()].filter(time => Math.abs(time - warStartMillis) < 1000 * 60 * 30 + this.preJoinTimer * 1000).length != 0
+        if (collidingTimers) {
             msg.reply(args[0] + " collides with a different war. Use !list and !unscheduleWar unwanted wars.")
             return;
         }
         const war = new War(this, msg, warStartMillis, this.startCallback, this.leaveCallback);
         this.startTimerWarMap.set(warStartMillis, war);
+        this.incrementWars();
         msg.reply("The war has been scheduled for " + args[0])
     }
 
@@ -158,15 +169,18 @@ class Guild {
             msg.reply("Illegal number of argument. Type !help for a list of commands")
             return;
         }
-        const timeArgs = args[0].split(":");
-        const current = new Date()
-        const warStartMillis = new Date(current.getFullYear(), current.getMonth(), current.getDate(), timeArgs[0], timeArgs[1], 0).getTime();
-        if (!this.startTimerWarMap.has(warStartMillis)) {
+        const timeStringToTimestamp = new Map();
+        Array.from(this.startTimerWarMap.keys()).forEach(timer => {
+            timeStringToTimestamp.set(millisToCETString(timer + this.timeZone), timer);
+        });
+        if (!timeStringToTimestamp.has(args[0])) {
             msg.reply("There's no war scheduled for " + args[0]);
             return;
         }
+        const warStartMillis = timeStringToTimestamp.get(args[0]);
         const war = this.startTimerWarMap.get(warStartMillis);
         war.unschedule();
+        this.decrementWars();
         this.startTimerWarMap.delete(warStartMillis);
         msg.reply("War has been successfully unscheduled!");
 
@@ -174,7 +188,7 @@ class Guild {
 
     handleList(msg) {
         let res = Array.from(this.startTimerWarMap.keys());
-        res = res.map(millisToCETString);
+        res = res.map(time => millisToCETString(time + this.timeZone));
         msg.reply("Current scheduled Wars: " + (res.length ? res.join(", ") : "none"));
     }
 
@@ -194,6 +208,9 @@ class Guild {
                 break;
             case 'firstCallTimer':
                 msg.reply("Current first call timer: " + this.firstCallTimer);
+                break;
+            case 'timeZone':
+                msg.reply(`Current time: ${millisToCETString(new Date().getTime() + this.timeZone)}`);
                 break;
             default:
                 msg.reply(args[0] + " is not a valid argument. Type !help for a list of commands");
@@ -225,9 +242,27 @@ class Guild {
                     msg.reply("preJoinTimer (in Seconds) has been changed to " + args[1]);
                 } else {
                     msg.reply(args[1] + " is not an integer");
-    
+
                 }
-    
+
+                break;
+            }
+            case 'timeZone': {
+                if(this.startTimerWarMap.size) {
+                    msg.reply("Can't change time zone while scheduling wars. Use !list and !unscheduleWar all listed wars.")
+                    return;
+                }
+                const millis = timeStringToMillis(args[1]);
+                if(!millis) {
+                    msg.reply(`${args[1]} is not a valid time`)
+                    return;
+                }
+                const strippedDate = new Date();
+                strippedDate.setSeconds(0);
+                strippedDate.setMilliseconds(0);
+                this.timeZone = millis - strippedDate.getTime();
+                guildService.save(this);
+                msg.reply(`Timezone has been set to match the current time of ${args[1]}.`)
                 break;
             }
             case 'firstCallTimer': {
@@ -237,9 +272,9 @@ class Guild {
                     msg.reply("firstCallTimer (in Seconds) has been changed to " + args[1]);
                 } else {
                     msg.reply(args[1] + " is not an integer");
-    
+
                 }
-    
+
                 break;
             }
             case 'callRate': {
@@ -256,6 +291,10 @@ class Guild {
             default:
                 msg.reply(args[0] + " is not a valid argument. Type !help for a list of commands")
         }
+    }
+
+    handleStats(msg) {
+        msg.reply(`Total wars with my assistance: ${this.warCount}`)
     }
 
     dispatch(msg) {
@@ -284,9 +323,12 @@ class Guild {
                     case "list":
                         this.handleList(msg);
                         break;
+                    case "stats":
+                        this.handleStats(msg);
+                        break;
                     default:
                         msg.reply("Invalid command. Type !help.")
-    
+
                 }
             }
         }
