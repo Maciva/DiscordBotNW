@@ -375,7 +375,7 @@ function buildSettingsDescriptorMap() {
         },
         {
             name: "callRate",
-            value: "5 10 15",
+            value: "\"5 10 15\"",
             description: "List of seconds before the bot calls for respawn waves."
         },
         {
