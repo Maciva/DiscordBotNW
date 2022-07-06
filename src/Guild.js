@@ -2,7 +2,8 @@ const { createAudioPlayer, NoSubscriberBehavior, getVoiceConnection, createAudio
 const help = require("./help");
 const { splitArgs, validateTimeArgs, getRandomLeaveFile, millisToCETString, validateTimeArgsMinuteSeconds, isInt, extractCallRate, timeStringToMillis } = require("./utils");
 const { War } = require("./War");
-const guildService = require("./guildService")
+const guildService = require("./guildService");
+const { Permissions } = require("discord.js");
 
 class Guild {
 
@@ -299,6 +300,15 @@ class Guild {
 
     dispatch(msg) {
         if (msg.channel.name === this.channelName) {
+            if(!msg.guild.me.permissions.has(
+                [
+                    Permissions.FLAGS.SEND_MESSAGES,
+                    Permissions.FLAGS.MANAGE_MESSAGES,
+                    Permissions.FLAGS.SPEAK,
+                    Permissions.FLAGS.CONNECT
+                ])) {
+                    return;
+                }
             if (msg.content.startsWith("!")) {
                 const args = splitArgs(msg.content)
                 switch (args[0].substr(1)) {
@@ -335,6 +345,16 @@ class Guild {
     }
 
     interact(interaction) {
+        if (interaction.channel.name !== this.channelName) return;
+        if(!interaction.guild.me.permissions.has(
+            [
+                Permissions.FLAGS.SEND_MESSAGES,
+                Permissions.FLAGS.MANAGE_MESSAGES,
+                Permissions.FLAGS.SPEAK,
+                Permissions.FLAGS.CONNECT
+            ])) {
+                return;
+            }
         const args = interaction.values[0].split("_");
         switch (args[0]) {
             case "scheduling":

@@ -74,9 +74,11 @@ function settingsRow(selected, disabled) {
 function handleHelp(msg) {
 
 
-    const embed = new MessageEmbed().setDescription(
-        "Please choose a category in the dropdown menu"
-    )
+    const embed = new MessageEmbed()
+        .setDescription(
+            "Please choose a category in the dropdown menu"
+        )
+        .setColor('AQUA')
         .setTitle("Help")
     msg.reply({
         embeds: [embed],
@@ -85,9 +87,11 @@ function handleHelp(msg) {
 }
 
 function helpScheduling(interaction) {
-    const embed = new MessageEmbed().setDescription(
-        "Commands for managing wars"
-    )
+    const embed = new MessageEmbed()
+        .setDescription(
+            "Commands for managing wars"
+        )
+        .setColor('AQUA')
         .setTitle("Scheduling")
         .addFields([
             {
@@ -118,9 +122,11 @@ function helpScheduling(interaction) {
 }
 
 function helpSettings(interaction, option) {
-    const embed = new MessageEmbed().setDescription(
-        `${option ? option.description : `Commands for customizing the bot. To view examples, select an option from the dropdown below.`} Values containing spaces have to be put in \"qoutes\".`
-    ).setTitle("Settings")
+    const embed = new MessageEmbed()
+        .setDescription(
+            `${option ? option.description : `Commands for customizing the bot. To view examples, select an option from the dropdown below.`} Values containing spaces have to be put in \"qoutes\".`
+        ).setTitle("Settings")
+        .setColor('AQUA')
         .addFields([
             {
                 name: `\`!settings get ${option ? option.name : '<OPTION>'}\``,
@@ -138,9 +144,11 @@ function helpSettings(interaction, option) {
 }
 
 function helpOther(interaction) {
-    const embed = new MessageEmbed().setDescription(
-        "Other commands"
-    ).setTitle("Other")
+    const embed = new MessageEmbed()
+        .setDescription(
+            "Other commands"
+        ).setTitle("Other")
+        .setColor('AQUA')
         .addFields([
             {
                 name: `\`!stats\``,
