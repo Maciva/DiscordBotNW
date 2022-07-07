@@ -53,6 +53,13 @@ class Guild {
             if (warChannel) {
                 if (warChannel.type === 'GUILD_VOICE') {
                     this.scheduleWar(msg, args);
+                    if(warChannel.permissionsFor(msg.guild.me).has([
+                        Permissions.FLAGS.SPEAK,
+                        Permissions.FLAGS.CONNECT,
+                    ])) {
+                        msg.reply(`Missing permissions to speak and/or join in ${this.warChannel}`)
+                        return;
+                    }
                 } else {
                     msg.reply("Channel " + this.warChannel + " is not a voice channel")
                 }
@@ -300,12 +307,10 @@ class Guild {
 
     dispatch(msg) {
         if (msg.channel.name === this.channelName) {
-            if(!msg.guild.me.permissions.has(
-                [
+
+            if(msg.channel.permissionsFor(msg.guild.me).has([
                     Permissions.FLAGS.SEND_MESSAGES,
                     Permissions.FLAGS.MANAGE_MESSAGES,
-                    Permissions.FLAGS.SPEAK,
-                    Permissions.FLAGS.CONNECT
                 ])) {
                     return;
                 }
@@ -346,15 +351,12 @@ class Guild {
 
     interact(interaction) {
         if (interaction.channel.name !== this.channelName) return;
-        if(!interaction.guild.me.permissions.has(
-            [
-                Permissions.FLAGS.SEND_MESSAGES,
-                Permissions.FLAGS.MANAGE_MESSAGES,
-                Permissions.FLAGS.SPEAK,
-                Permissions.FLAGS.CONNECT
-            ])) {
-                return;
-            }
+        if(msg.channel.permissionsFor(msg.guild.me).has([
+            Permissions.FLAGS.SEND_MESSAGES,
+            Permissions.FLAGS.MANAGE_MESSAGES,
+        ])) {
+            return;
+        }
         const args = interaction.values[0].split("_");
         switch (args[0]) {
             case "scheduling":

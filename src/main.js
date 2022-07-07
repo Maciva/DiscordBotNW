@@ -22,6 +22,7 @@ client.on("messageCreate", msg => {
     if (msg.author.id === client.user.id) {
         return;
     }
+    if (!msg.guild) return;
     guildService.dispatch(msg.guild.id, msg);
 })
 
