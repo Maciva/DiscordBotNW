@@ -308,7 +308,7 @@ class Guild {
     dispatch(msg) {
         if (msg.channel.name === this.channelName) {
 
-            if(msg.channel.permissionsFor(msg.guild.me).has([
+            if(!msg.channel.permissionsFor(msg.guild.me).has([
                     Permissions.FLAGS.SEND_MESSAGES,
                     Permissions.FLAGS.MANAGE_MESSAGES,
                 ])) {
