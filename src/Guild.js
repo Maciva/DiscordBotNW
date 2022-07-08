@@ -351,7 +351,7 @@ class Guild {
 
     interact(interaction) {
         if (interaction.channel.name !== this.channelName) return;
-        if(msg.channel.permissionsFor(msg.guild.me).has([
+        if(interaction.channel.permissionsFor(msg.guild.me).has([
             Permissions.FLAGS.SEND_MESSAGES,
             Permissions.FLAGS.MANAGE_MESSAGES,
         ])) {
