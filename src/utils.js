@@ -76,12 +76,8 @@ function splitArgs(string) {
 }
 
 function isInt(arg) {
-    try {
-        parseInt(arg)
-        return true;
-    } catch (err) {
-        return false;
-    }
+    const num = Number(arg);
+    return Number.isInteger(num);
 }
 
 function extractCallRate(arg) {

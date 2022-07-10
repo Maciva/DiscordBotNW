@@ -52,14 +52,14 @@ class Guild {
         this.getFirstChannelFromName(this.warChannel).then((warChannel) => {
             if (warChannel) {
                 if (warChannel.type === 'GUILD_VOICE') {
-                    this.scheduleWar(msg, args);
-                    if(warChannel.permissionsFor(msg.guild.me).has([
+                    if(!warChannel.permissionsFor(msg.guild.me).has([
                         Permissions.FLAGS.SPEAK,
                         Permissions.FLAGS.CONNECT,
                     ])) {
                         msg.reply(`Missing permissions to speak and/or join in ${this.warChannel}`)
                         return;
                     }
+                    this.scheduleWar(msg, args);
                 } else {
                     msg.reply("Channel " + this.warChannel + " is not a voice channel")
                 }
@@ -307,7 +307,6 @@ class Guild {
 
     dispatch(msg) {
         if (msg.channel.name === this.channelName) {
-
             if(!msg.channel.permissionsFor(msg.guild.me).has([
                     Permissions.FLAGS.SEND_MESSAGES,
                     Permissions.FLAGS.MANAGE_MESSAGES,
@@ -315,6 +314,7 @@ class Guild {
                     return;
                 }
             if (msg.content.startsWith("!")) {
+                console.log(msg.content)
                 const args = splitArgs(msg.content)
                 switch (args[0].substr(1)) {
                     case "scheduleWar":
