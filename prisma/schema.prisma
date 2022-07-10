@@ -9,8 +9,8 @@ datasource db {
 
 model server {
     id String @id
-    firstCallTimer String
-    preJoinTimer String
+    firstCallTimer Int
+    preJoinTimer Int
     channelName String
     warChannel String
     callRate Int[]
