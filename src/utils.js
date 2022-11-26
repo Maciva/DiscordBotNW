@@ -82,7 +82,7 @@ function isInt(arg) {
 
 function extractCallRate(arg) {
     try {
-        let nums = arg.split(" ").map(element => parseInt(element));
+        let nums = arg.trim().split(" ").map(element => parseInt(element));
         if (nums.filter(element => element).length == 0) {
             return undefined;
         }

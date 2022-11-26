@@ -26,6 +26,10 @@ function createDefault(id) {
     })
 }
 
+function deleteServer(id) {
+    persistance.deleteServer(id);
+}
+
 function save(guild) {
     const obj = {
         "id": guild.id,
@@ -103,4 +107,5 @@ exports.createDefault = createDefault;
 exports.get = get;
 exports.dispatch = dispatch;
 exports.interact = interact;
+exports.deleteServer = deleteServer;
 exports.save = save;

@@ -41,7 +41,7 @@ class Guild {
             global.client.guilds.fetch().then(data => {
                 data.get(this.id).fetch().then(guild => {
                     guild.channels.fetch().then(channels => {
-                        resolve(channels.find(channel => channel.name == name))
+                        resolve(channels.filter(channels => channels).find(channel => channel.name == name))
                     })
                 })
             })
@@ -124,6 +124,7 @@ class Guild {
         const warStartMillis = timeStringToMillis(args[0]) - this.timeZone;
         if (!warStartMillis) {
             msg.reply(`${args[0]} is not a valid time.`)
+            return;
         }
         if (this.checkForCollidingTimers(warStartMillis)) {
             msg.reply(args[0] + " collides with a different war. !leaveWar the curent war or use !list and !unscheduleWar unwanted wars.")
@@ -322,7 +323,7 @@ class Guild {
         if (msg.channel.name === this.channelName) {
             if(!msg.channel.permissionsFor(msg.guild.me).has([
                     Permissions.FLAGS.SEND_MESSAGES,
-                    Permissions.FLAGS.MANAGE_MESSAGES,
+                    Permissions.FLAGS.MANAGE_MESSAGES
                 ])) {
                     return;
                 }

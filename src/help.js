@@ -100,7 +100,7 @@ function helpScheduling(interaction) {
             },
             {
                 name: `\`!startWar <MM:SS>\``,
-                value: 'Schedule a war which starts at given time (MM:SS)',
+                value: 'Schedule a war which starts in given time (MM:SS)',
             },
             {
                 name: `\`!leaveWar\``,

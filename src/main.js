@@ -9,8 +9,20 @@ const client = new Client({
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 })
 
+function cleanUpDatabase() {
+    return;
+    // return new Promise((resolve, reject) => {
+    //     client.guilds.fetch().then(data => {
+    //         data.get(this.id).fetch().then(guild => {
+                
+    //         })
+    //     })
+    // })
+}
+
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`)
+    cleanUpDatabase();
     client.user.setPresence({
         activities: [{
             name: '"!help" for commands'
@@ -23,13 +35,21 @@ client.on("messageCreate", msg => {
         return;
     }
     if (!msg.guild) return;
-    guildService.dispatch(msg.guild.id, msg);
+    try {
+        guildService.dispatch(msg.guild.id, msg);
+    } catch (err) {
+        console.log(err);
+    }
 })
 
 client.on("interactionCreate", interaction => {
     if (!interaction.isSelectMenu()) return;
     guildService.interact(interaction.guild.id, interaction);
 })
+
+client.on("guildDelete", guild => {
+    guildService.deleteServer(guild.id);
+});
 
 client.login(process.env.TOKEN)
 

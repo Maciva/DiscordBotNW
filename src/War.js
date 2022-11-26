@@ -51,6 +51,12 @@ class War {
 
     joinWarChannel() {
         this.getFirstChannelFromName(this.guild.warChannel).then(warChannel => {
+            if (!warChannel) {
+                this.guild.getFirstChannelFromName(this.guild.channelName).then(channel => {
+                    channel.send(`Something went wrong joining the war channel. Couldn't find warChannel with name ${this.guild.warChannel}`)
+                });
+                return;
+            }
             var con = joinVoiceChannel({
                 channelId: warChannel.id,
                 guildId: this.msg.guild.id,
@@ -68,7 +74,7 @@ class War {
             global.client.guilds.fetch().then(data => {
                 data.get(this.guild.id).fetch().then(guild => {
                     guild.channels.fetch().then(channels => {
-                        resolve(channels.find(channel => channel.name == name))
+                        resolve(channels.filter(channel => channel).find(channel => channel.name == name))
                     })
                 })
             })
@@ -106,6 +112,9 @@ class War {
     }
 
     playFile(file) {
+        if(!file) {
+            return;
+        }
         const resource = createAudioResource(file);
         if (this.guild.player) {
             this.guild.player.play(resource)
