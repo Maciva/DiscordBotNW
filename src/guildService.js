@@ -65,22 +65,24 @@ function get(id) {
 
 
 
-function dispatch(id, msg) {
-    if (!idToServerMap.has(id)) {
-        get(id).then(resultGuild => {
-            if (resultGuild) {
-                idToServerMap.set(id, resultGuild)
-                idToServerMap.get(id).dispatch(msg);
-            } else {
-                createDefault(id).then((resultDefault) => {
-                    idToServerMap.set(id, resultDefault);
-                    idToServerMap.get(id).dispatch(msg);
-                })
-            }
-        })
-    } else {
-        idToServerMap.get(id).dispatch(msg);
-    }
+function getOrCreate(id) {
+    return new Promise(resolve => {
+        if (!idToServerMap.has(id)) {
+            get(id).then(resultGuild => {
+                if (resultGuild) {
+                    idToServerMap.set(id, resultGuild)
+                    resolve(idToServerMap.get(id));
+                } else {
+                    createDefault(id).then((resultDefault) => {
+                        idToServerMap.set(id, resultDefault);
+                        resolve(idToServerMap.get(id));
+                    })
+                }
+            })
+        } else {
+            resolve(idToServerMap.get(id));
+        }
+    })
 
 }
 
@@ -105,7 +107,7 @@ function interact(id, interaction) {
 
 exports.createDefault = createDefault;
 exports.get = get;
-exports.dispatch = dispatch;
+exports.getOrCreate = getOrCreate;
 exports.interact = interact;
 exports.deleteServer = deleteServer;
 exports.save = save;

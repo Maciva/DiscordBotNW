@@ -1,9 +1,9 @@
-const { MessageActionRow, MessageSelectMenu, MessageEmbed } = require("discord.js");
+const { ActionRowBuilder, SelectMenuBuilder, EmbedBuilder } = require("discord.js");
 
 function row(selected) {
-    return new MessageActionRow()
+    return new ActionRowBuilder()
         .addComponents(
-            new MessageSelectMenu()
+            new SelectMenuBuilder()
                 .setCustomId('selected')
                 .setPlaceholder('Nothing selected')
                 .addOptions([
@@ -30,9 +30,9 @@ function row(selected) {
 }
 
 function settingsRow(selected, disabled) {
-    return new MessageActionRow()
+    return new ActionRowBuilder()
         .addComponents(
-            new MessageSelectMenu()
+            new SelectMenuBuilder()
                 .setCustomId('sub_selected')
                 .setPlaceholder(disabled ? "Settings options" : "Nothing selected")
                 .setDisabled(disabled)
@@ -74,11 +74,11 @@ function settingsRow(selected, disabled) {
 function handleHelp(msg) {
 
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setDescription(
             "Please choose a category in the dropdown menu"
         )
-        .setColor('AQUA')
+        .setColor(0xAAAAFF)
         .setTitle("Help")
     msg.reply({
         embeds: [embed],
@@ -87,11 +87,11 @@ function handleHelp(msg) {
 }
 
 function helpScheduling(interaction) {
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setDescription(
             "Commands for managing wars"
         )
-        .setColor('AQUA')
+        .setColor(0xAAAAFF)
         .setTitle("Scheduling")
         .addFields([
             {
@@ -122,11 +122,11 @@ function helpScheduling(interaction) {
 }
 
 function helpSettings(interaction, option) {
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setDescription(
             `${option ? option.description : `Commands for customizing the bot. To view examples, select an option from the dropdown below.`} Values containing spaces have to be put in \"qoutes\".`
         ).setTitle("Settings")
-        .setColor('AQUA')
+        .setColor(0xAAAAFF)
         .addFields([
             {
                 name: `\`!settings get ${option ? option.name : '<OPTION>'}\``,
@@ -144,11 +144,11 @@ function helpSettings(interaction, option) {
 }
 
 function helpOther(interaction) {
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setDescription(
             "Other commands"
         ).setTitle("Other")
-        .setColor('AQUA')
+        .setColor(0xAAAAFF)
         .addFields([
             {
                 name: `\`!stats\``,

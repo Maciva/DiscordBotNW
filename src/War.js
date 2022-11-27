@@ -1,7 +1,7 @@
-const { createAudioResource, joinVoiceChannel, AudioPlayerStatus } = require('@discordjs/voice');
+const { createAudioResource, joinVoiceChannel, AudioPlayerStatus, createAudioPlayer, getVoiceConnection } = require('@discordjs/voice');
 const path = require('path');
 const sounds = require('./sounds');
-const { getRandomJoinFile } = require('./utils');
+const { getRandomJoinFile, getRandomLeaveFile } = require('./utils');
 const respawns = require(path.join("..", 'config', 'respawns.json'));
 
 class War {
@@ -15,6 +15,7 @@ class War {
         this.timeoutId = null;
         this.leaveCallback = leaveCallback;
         this.startCallback = startCallback;
+        this.player = createAudioPlayer();
         this.scheduleWar();
     }
 
@@ -35,7 +36,20 @@ class War {
 
     leaveWar() {
         this.clearTimeouts();
-        this.leaveCallback();
+        this.playFile(getRandomLeaveFile());
+        var con = getVoiceConnection(this.guild.id);
+        this.player.once(AudioPlayerStatus.Idle, () => {
+            this.player.stop();
+            con.destroy();
+            this.leaveCallback();
+        })
+    }
+
+    playFile(file) {
+        const resource = createAudioResource(file);
+        if (this.player) {
+            this.player.play(resource)
+        }
     }
 
     scheduleTimers() {
@@ -64,8 +78,8 @@ class War {
                 selfMute: false,
                 selfDeaf: false
             })
-            con.subscribe(this.guild.player)
-            this.playFile(getRandomJoinFile())
+                con.subscribe(this.player)
+                this.playFile(getRandomJoinFile())
         });
     }
 
@@ -103,7 +117,7 @@ class War {
         this.setTimeoutWrapper(() => {
             this.playFile(file);
             if (last) {
-                this.guild.player.once(AudioPlayerStatus.Idle, () => {
+                this.player.once(AudioPlayerStatus.Idle, () => {
                     this.playFile(sounds.counterSounds.noRespawn)
                 })
             }
@@ -116,8 +130,8 @@ class War {
             return;
         }
         const resource = createAudioResource(file);
-        if (this.guild.player) {
-            this.guild.player.play(resource)
+        if (this.player) {
+            this.player.play(resource)
         }
     }
 
