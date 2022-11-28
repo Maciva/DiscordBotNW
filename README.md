@@ -41,6 +41,11 @@ To setup the database schema, run:
 ```
 npx prisma migrate dev
 ```
+To deploy all commands, run:
+```
+node ./src/deployCommands.js
+```
+
 To start the server, run
 ```
 node ./src/main.js
