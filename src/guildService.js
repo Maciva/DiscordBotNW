@@ -3,7 +3,6 @@ const { Guild } = require('./Guild')
 
 const defaultServer = {
     "preJoinTimer": 300,
-    "channelName": "war-bot",
     "warChannel": "war-channel",
     "callRate": [15, 10, 5],
     "firstCallTimer": 600,
@@ -20,7 +19,7 @@ function createDefault(id) {
                 reject(err);
                 return;
             }
-            const tmp = new Guild(data.id, data.preJoinTimer, data.channelName, data.warChannel, data.callRate, data.warCount, data.timeZone)
+            const tmp = new Guild(data.id, data.preJoinTimer, data.warChannel, data.callRate, data.warCount, data.timeZone)
             resolve(tmp);
         })
     })
@@ -34,7 +33,6 @@ function save(guild) {
     const obj = {
         "id": guild.id,
         "preJoinTimer": guild.preJoinTimer,
-        "channelName": guild.channelName,
         "warChannel": guild.warChannel,
         "callRate": guild.callRate,
         "firstCallTimer": guild.firstCallTimer,
@@ -56,7 +54,7 @@ function get(id) {
                     resolve(data);
                     return;
                 }
-                const tmp = new Guild(data.id, data.preJoinTimer, data.channelName, data.warChannel, data.callRate, data.firstCallTimer, data.warCount, data.timeZone)
+                const tmp = new Guild(data.id, data.preJoinTimer, data.warChannel, data.callRate, data.firstCallTimer, data.warCount, data.timeZone)
                 resolve(tmp);
             }
         })

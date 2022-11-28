@@ -7,10 +7,9 @@ const { PermissionsBitField, ChannelType, EmbedBuilder } = require("discord.js")
 
 class Guild {
 
-    constructor(id, preJoinTimer, channelName, warChannel, callRate, firstCallTimer, warCount, timeZone) {
+    constructor(id, preJoinTimer, warChannel, callRate, firstCallTimer, warCount, timeZone) {
         this.id = id
         this.preJoinTimer = preJoinTimer;
-        this.channelName = channelName;
         this.warChannel = warChannel;
         this.callRate = callRate;
         this.firstCallTimer = firstCallTimer;
@@ -92,13 +91,13 @@ class Guild {
     startWar(msg, time) {
         const timeArgs = time.split(":");
         if (!validateTimeArgsMinuteSeconds(timeArgs)) {
-            msg.reply(time + " is not a valid time. Type !help for a list of commands")
+            msg.reply(time + " is not a valid time. Type /help for a list of commands")
             return;
         }
         const current = new Date()
         const warStartMillis = new Date(current.getFullYear(), current.getMonth(), current.getDate(), current.getHours(), current.getMinutes() + parseInt(timeArgs[0]), current.getSeconds() + parseInt(timeArgs[1])).getTime();
         if (this.checkForCollidingTimers(warStartMillis)) {
-            msg.reply(time + " collides with a different war. !leaveWar the current war or use !list and !unscheduleWar unwanted wars.")
+            msg.reply(time + " collides with a different war. !leaveWar the current war or use /list and /unschedule-war unwanted wars.")
             return;
         }
         const war = new War(this, msg, warStartMillis, this.startCallback, this.leaveCallback);
@@ -114,7 +113,7 @@ class Guild {
             return;
         }
         if (this.checkForCollidingTimers(warStartMillis)) {
-            msg.reply(time + " collides with a different war. !leaveWar the curent war or use !list and !unscheduleWar unwanted wars.")
+            msg.reply(time + " collides with a different war. /leaveWar the curent war or use /list and /unschedule-war unwanted wars.")
             return;
         }
         const war = new War(this, msg, warStartMillis, this.startCallback, this.leaveCallback);
@@ -136,8 +135,8 @@ class Guild {
 
     handleLeave(interaction) {
         if (this.activeWar) {
-            this.activeWar.leaveWar();
             interaction.reply("Leaving war channel");
+            this.activeWar.leaveWar();
         } else {
             interaction.reply("No active war");
         }
@@ -145,19 +144,6 @@ class Guild {
 
     leaveCallback = () => {
         this.activeWar = undefined;
-    }
-
-    handleSettings(msg, args) {
-        switch (args[0]) {
-            case 'get':
-                this.handleSettingsGet(msg, args.slice(1));
-                break;
-            case 'set':
-                this.handleSettingsSet(msg, args.slice(1));
-                break;
-            default:
-                msg.reply(args[0] + " is not a valid argument. Type !help for a list of commands")
-        }
     }
 
     handleHelp(msg) {
@@ -244,7 +230,7 @@ class Guild {
         const input = interaction.options.data[0].value;
         const nums = extractCallRate(input)
         if (!nums) {
-            interaction.reply(input + " contains non numbers or is in the wrong format. Type !help for a list of commands")
+            interaction.reply(input + " contains non numbers or is in the wrong format. Type /help for a list of commands")
             return;
         }
         this.callRate = nums.sort((a, b) => a - b).reverse();
@@ -276,7 +262,6 @@ class Guild {
     }
 
     interact(interaction) {
-        if (interaction.channel.name !== this.channelName) return;
         if (!interaction.channel.permissionsFor(interaction.guild.members.me).has([
             PermissionsBitField.Flags.SendMessages,
             PermissionsBitField.Flags.ManageMessages
@@ -302,32 +287,27 @@ function buildSettingsDescriptorMap() {
     const resultMap = new Map();
     [
         {
-            name: "channelName",
-            value: "\"war bot\"",
-            description: "Name of the channel the bot should listen for commands on."
-        },
-        {
-            name: "warChannel",
-            value: "\"war channel\"",
+            name: "war-channel",
+            value: "war channel",
             description: "Name of the voice channel the bot should join for war."
         },
         {
-            name: "preJoinTimer",
+            name: "pre-join-timer",
             value: "300",
             description: "Time in seconds before the bot should join the war channel."
         },
         {
-            name: "firstCallTimer",
+            name: "first-call-timer",
             value: "600",
             description: "Time in seconds after the bot starts calling waves in war (to reduce spam for frequent early respawn waves)."
         },
         {
-            name: "callRate",
-            value: "\"5 10 15\"",
+            name: "call-rate",
+            value: "5 10 15",
             description: "List of seconds before the bot calls for respawn waves."
         },
         {
-            name: "timeZone",
+            name: "timezone",
             value: "19:30",
             description: "Set the bots time calcluations to match the current time. Either put in your local time or the time of the server you are playing on."
         },

@@ -1,6 +1,4 @@
 const { Client, IntentsBitField, Events, Collection } = require("discord.js");
-const { REST } = require("@discordjs/rest");
-const { Routes } = require('discord-api-types/v9');
 const path = require('node:path');
 require('dotenv').config()
 const fs = require('node:fs');
@@ -12,30 +10,6 @@ const client = new Client({
     intents: intents,
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 })
-
-function deployCommands() {
-    const commands = [];
-    const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
-
-    for (const file of commandFiles) {
-        const command = require(`./commands/${file}`);
-        commands.push(command.data.toJSON());
-    }
-    const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
-    (async () => {
-        try {
-            console.log(`Started refreshing ${commands.length} application (/) commands.`);
-            const data = await rest.put(
-                Routes.applicationGuildCommands(client.user.id, '962100467322716170'),
-                { body: commands },
-            );
-
-            console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-        } catch (error) {
-            console.error(error);
-        }
-    })();
-}
 
 function cleanUpDatabase() {
     return;
@@ -50,11 +24,10 @@ function cleanUpDatabase() {
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`)
-    deployCommands();
     cleanUpDatabase();
     client.user.setPresence({
         activities: [{
-            name: '"!help" for commands'
+            name: '"/help" for commands'
         }]
     })
 })

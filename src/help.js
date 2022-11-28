@@ -38,34 +38,29 @@ function settingsRow(selected, disabled) {
                 .setDisabled(disabled)
                 .addOptions([
                     {
-                        label: 'channelName',
-                        value: 'settings_channelName',
-                        default: selected === 'channelName'
+                        label: 'war-channel',
+                        value: 'settings_war-channel',
+                        default: selected === 'war-channel'
                     },
                     {
-                        label: 'warChannel',
-                        value: 'settings_warChannel',
-                        default: selected === 'warChannel'
+                        label: 'pre-join-timer',
+                        value: 'settings_pre-join-timer',
+                        default: selected === 'pre-join-timer'
                     },
                     {
-                        label: 'preJoinTimer',
-                        value: 'settings_preJoinTimer',
-                        default: selected === 'preJoinTimer'
+                        label: 'first-call-timer',
+                        value: 'settings_first-call-timer',
+                        default: selected === 'first-call-timer'
                     },
                     {
-                        label: 'firstCallTimer',
-                        value: 'settings_firstCallTimer',
-                        default: selected === 'firstCallTimer'
+                        label: 'call-rate',
+                        value: 'settings_call-rate',
+                        default: selected === 'call-rate'
                     },
                     {
-                        label: 'callRate',
-                        value: 'settings_callRate',
-                        default: selected === 'callRate'
-                    },
-                    {
-                        label: 'timeZone',
-                        value: 'settings_timeZone',
-                        default: selected === 'timeZone'
+                        label: 'timezone',
+                        value: 'settings_timezone',
+                        default: selected === 'timezone'
                     },
                 ]),
         );
@@ -95,24 +90,24 @@ function helpScheduling(interaction) {
         .setTitle("Scheduling")
         .addFields([
             {
-                name: `\`!scheduleWar <HH:MM>\``,
+                name: `\`/schedule-war <HH:MM>\``,
                 value: 'Schedule a war at given time (HH:MM).',
             },
             {
-                name: `\`!startWar <MM:SS>\``,
+                name: `\`/start-war <MM:SS>\``,
                 value: 'Schedule a war which starts in given time (MM:SS)',
             },
             {
-                name: `\`!leaveWar\``,
+                name: `\`/leave-war\``,
                 value: 'Manually make the bot leave the war channel',
             },
             {
-                name: `\`!list\``,
+                name: `\`/list\``,
                 value: 'List all scheduled wars',
             },
             {
-                name: `\`!unscheduleWar <HH:MM>\``,
-                value: 'Unschedule a war at time (HH:MM) specified by \`!list\`.',
+                name: `\`/unschedule-war <HH:MM>\``,
+                value: 'Unschedule a war at time (HH:MM) specified by \`/list\`.',
             },
         ])
     interaction.update({
@@ -124,16 +119,12 @@ function helpScheduling(interaction) {
 function helpSettings(interaction, option) {
     const embed = new EmbedBuilder()
         .setDescription(
-            `${option ? option.description : `Commands for customizing the bot. To view examples, select an option from the dropdown below.`} Values containing spaces have to be put in \"qoutes\".`
+            `${option ? option.description : `Commands for customizing the bot. To view examples, select an option from the dropdown below.`}`
         ).setTitle("Settings")
         .setColor(0xAAAAFF)
         .addFields([
             {
-                name: `\`!settings get ${option ? option.name : '<OPTION>'}\``,
-                value: `Get the settings of ${option ? ` the ${option.name} option` : `the specified option`}.`,
-            },
-            {
-                name: `\`!settings set ${option ? option.name : '<OPTION>'} ${option ? option.value : '<VALUE>'}\``,
+                name: `\`/set-${option ? option.name : '<OPTION>'} ${option ? option.value : '<VALUE>'}\``,
                 value: `Set ${option ? option.name : `an option`} to ${option ? option.value : `a specified value`}.`,
             },
         ])
@@ -151,7 +142,7 @@ function helpOther(interaction) {
         .setColor(0xAAAAFF)
         .addFields([
             {
-                name: `\`!stats\``,
+                name: `\`/stats\``,
                 value: 'Get the total number of wars',
             }
         ])
